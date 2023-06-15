@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
+    <link rel="stylesheet" href="/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barcode Reader</title>
+  </head>
+  <body>
+    <main class="wrapper" style="padding-top: 2em">
+      <h1 class="title">ZXing Barcode</h1>
+
+      <div class="control">
+        <button id="startButton">Start Scanning</button>
+        <button id="resetButton">Reset</button>
+      </div>
+      <div class="control">
+        <button id="startTimer">Start Timer</button>
+        <button id="resetTimer" disabled>Reset Timer</button>
+
+        <pre><code id="interval"></code></pre>
+      </div>
+
+      <div>
+        <video
+          id="video"
+          width="400"
+          height="200"
+          style="border: 1px solid gray"
+        ></video>
+      </div>
+
+      <div id="sourceSelectPanel" style="display: none; margin-bottom: 1rem">
+        <select id="sourceSelect" style="max-width: 400px"></select>
+      </div>
+
+      <label>Result:</label>
+      <pre><code id="result"></code></pre>
+    </main>
+
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"
+    ></script>
+    <script type="text/javascript">
+      window.addEventListener('load', function () {
+        // Timer
+        let timer;
+        let interval = 0;
+        const startTimer = () => {
+          timer = setInterval(() => {
+            console.log('timer');
+            document.getElementById('interval').textContent = interval++;
+          }, 500);
+        };
+        document.getElementById('startTimer').addEventListener('click', () => {
+          interval = 0;
+          document.getElementById('startTimer').disabled = true;
+          document.getElementById('resetTimer').disabled = false;
+          document.getElementById('interval').textContent = interval;
+          startTimer();
+        });
+        document.getElementById('resetTimer').addEventListener('click', () => {
+          document.getElementById('startTimer').disabled = false;
+          document.getElementById('resetTimer').disabled = true;
+          clearInterval(timer);
+        });
+
+        // ZXing code reader
+        let selectedDeviceId;
+        const codeReader = new ZXing.BrowserMultiFormatReader();
+        console.log('ZXing code reader initialized');
+        codeReader
+          .listVideoInputDevices()
+          .then((videoInputDevices) => {
+            const sourceSelect = document.getElementById('sourceSelect');
+            selectedDeviceId = videoInputDevices[0].deviceId;
+            if (videoInputDevices.length >= 1) {
+              videoInputDevices.forEach((element) => {
+                const sourceOption = document.createElement('option');
+                sourceOption.text = element.label;
+                sourceOption.value = element.deviceId;
+                sourceSelect.appendChild(sourceOption);
+              });
+
+              sourceSelect.onchange = () => {
+                selectedDeviceId = sourceSelect.value;
+              };
+
+              const sourceSelectPanel =
+                document.getElementById('sourceSelectPanel');
+              sourceSelectPanel.style.display = 'block';
+            }
+
+            document
+              .getElementById('startButton')
+              .addEventListener('click', () => {
+                codeReader.decodeFromVideoDevice(
+                  selectedDeviceId,
+                  'video',
+                  (result, err) => {
+                    if (result) {
+                      console.log(result);
+                      document.getElementById('result').textContent =
+                        result.text;
+                      document.getElementById('resetTimer').click();
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                      console.error(err);
+                      document.getElementById('result').textContent = err;
+                    }
+                  }
+                );
+                console.log(
+                  `Started continous decode from camera with id ${selectedDeviceId}`
+                );
+              });
+
+            document
+              .getElementById('resetButton')
+              .addEventListener('click', () => {
+                codeReader.reset();
+                document.getElementById('result').textContent = '';
+                console.log('Reset.');
+              });
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      });
+    </script>
+  </body>
+</html>
