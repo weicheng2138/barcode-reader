@@ -18,9 +18,8 @@
       <div class="control">
         <button id="startTimer">Start Timer</button>
         <button id="resetTimer" disabled>Reset Timer</button>
-
-        <pre><code id="interval"></code></pre>
       </div>
+      <pre><code id="interval"></code></pre>
 
       <div>
         <video
@@ -48,11 +47,16 @@
         // Timer
         let timer;
         let interval = 0;
+        document.getElementById('interval').textContent = `${interval} s`;
+
         const startTimer = () => {
           timer = setInterval(() => {
             console.log('timer');
-            document.getElementById('interval').textContent = interval++;
-          }, 500);
+            interval++;
+            document.getElementById('interval').textContent = `${
+              interval / 10
+            } s`;
+          }, 100);
         };
         document.getElementById('startTimer').addEventListener('click', () => {
           interval = 0;
