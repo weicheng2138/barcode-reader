@@ -52,7 +52,7 @@ h1 {
 }
 
 main {
-  margin-top: 2rem;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -61,6 +61,7 @@ main {
 
 code {
   font-size: 1rem;
+  color: #ff5733;
 }
 
 .logo {
@@ -82,7 +83,12 @@ code {
   flex-direction: row;
   gap: 0.5rem;
   justify-content: center;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
+}
+
+h1 {
+  margin: 1rem;
+  font-size: 2rem;
 }
 
 .card {

@@ -25,9 +25,9 @@
       <div>
         <video
           id="video"
-          width="400"
-          height="200"
-          style="border: 1px solid gray"
+          width="300"
+          height="400"
+          style="border: 2px solid gray"
         ></video>
       </div>
 
@@ -68,6 +68,7 @@
         });
 
         // ZXing code reader
+        document.getElementById('result').textContent = ' ';
         let selectedDeviceId;
         const codeReader = new ZXing.BrowserMultiFormatReader();
         console.log('ZXing code reader initialized');
@@ -96,6 +97,7 @@
             document
               .getElementById('startButton')
               .addEventListener('click', () => {
+                document.getElementById('result').textContent = ' ';
                 codeReader.decodeFromVideoDevice(
                   selectedDeviceId,
                   'video',
